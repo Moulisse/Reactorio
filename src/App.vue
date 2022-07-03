@@ -66,11 +66,14 @@ function createWorld() {
   viewport.addChild(wheelRenderSprite)
 
   const container = new PIXI.Container()
-  //app.stage.addChild(wheelContainer)
   for (let i = 0; i < size; i++) {
     for (let j = 0; j < size; j++) {
+      const components = { r: 50, g: 180 + Math.random() * 8, b: 50 }
+
+      const color = (components.r << 16) + (components.g << 8) + components.b
+
       const bunny = new PIXI.Graphics()
-      bunny.beginFill(Math.random() * 255)
+      bunny.beginFill(color)
       bunny.drawRect(0, 0, 40, 40)
       bunny.x = i * 40
       bunny.y = j * 40
@@ -107,7 +110,7 @@ function toggleCursor() {
     const mesh = new PIXI.Graphics()
 
     mesh
-      .beginFill(0xffffff, 0.8)
+      .beginFill(0xffffff)
       .moveTo(15, 5)
       .lineTo(15, 13)
       .arc(13, 13, 2, 0, Math.PI / 2, false)
