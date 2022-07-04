@@ -10,6 +10,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@pixi/tilemap": "^3.2.2",
     "pinia": "^2.0.14",
     "pixi-viewport": "^4.34.4",
     "pixi.js": "^6.4.2",

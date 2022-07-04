@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.card-1 {
+  @apply bg-slate-900 text-slate-50 text-xl;
+}
+
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 16px;
+  }
+}
+@media (min-width: 1536px) {
+  html {
+    font-size: 18px;
+  }
+}

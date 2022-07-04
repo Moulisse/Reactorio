@@ -31,7 +31,9 @@ export class Game {
 
     // activate plugins
     this.viewport
-      .drag()
+      .drag({
+        mouseButtons: 'left',
+      })
       .wheel({
         smooth: 10,
       })

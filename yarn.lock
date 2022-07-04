@@ -234,6 +234,11 @@
   resolved "https://registry.yarnpkg.com/@pixi/ticker/-/ticker-6.4.2.tgz#5e84fcd9c76240e9c141f268b780de19b63cf231"
   integrity sha512-OM2U0qLiU2Z+qami7DRNkBJnx20ElQO/5mJNsoHQRH6k/po0nXlux8jcCXhh5DE9lds4RdUFAwTL4RmLT1clDw==
 
+"@pixi/tilemap@^3.2.2":
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/@pixi/tilemap/-/tilemap-3.2.2.tgz#8327e5d7007a90be640a0b1eb9943a1e405b57e4"
+  integrity sha512-svdmMyJP63vdae3t66tCmE8IWeO/6lD1xXU+5gzfxqxJS5seTp2bm8mQok2c8PF0O6l/NYlLz6BRklOuEuHboQ==
+
 "@pixi/utils@6.4.2":
   version "6.4.2"
   resolved "https://registry.yarnpkg.com/@pixi/utils/-/utils-6.4.2.tgz#77c5bac2ba26094ac0308327a5b6685d3287f649"
