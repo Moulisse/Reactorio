@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@pixi/tilemap": "^3.2.2",
+    "fast-xml-parser": "^4.0.8",
     "pinia": "^2.0.14",
     "pixi-viewport": "^4.34.4",
     "pixi.js": "^6.4.2",

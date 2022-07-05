@@ -1,3 +1,4 @@
+import type { Game } from './Game'
 import type { Viewport } from 'pixi-viewport'
 import * as PIXI from 'pixi.js'
 import Constants from './Constants'
@@ -8,40 +9,57 @@ import Constants from './Constants'
 export class World {
   background: PIXI.Sprite
 
-  constructor(app: PIXI.Application, viewport: Viewport) {
-    const wheelRenderTexture = PIXI.RenderTexture.create({
-      width: Constants.tileSize * Constants.worldSize.x,
-      height: Constants.tileSize * Constants.worldSize.y,
+  chunks = {
+    startX: 0,
+    startY: 0,
+    endX: 0,
+    endY: 0,
+  }
+
+  private game: Game
+
+  constructor(game: Game) {
+    this.game = game
+
+    this.background = new PIXI.Sprite()
+    game.viewport.addChild(this.background)
+
+    this.game.viewport.on('move', this.refreshChunks)
+    this.refreshChunks()
+  }
+
+  /**
+   * calcul les chunks a afficher et re-render s'ils changent
+   */
+  refreshChunks() {
+    const renderTexture = PIXI.RenderTexture.create({
+      width: Constants.tileSize * 50,
+      height: Constants.tileSize * 50,
     })
-    this.background = new PIXI.Sprite(wheelRenderTexture)
-    viewport.addChild(this.background)
+    this.background.texture = renderTexture
 
     const container = new PIXI.Container()
-    for (let i = 0; i < Constants.worldSize.x; i++) {
-      for (let j = 0; j < Constants.worldSize.y; j++) {
-        const components = { r: 50, g: 180 + Math.random() * 8, b: 50 }
 
-        const color = (components.r << 16) + (components.g << 8) + components.b
+    const components = { r: 50, g: 180 + Math.random() * 8, b: 50 }
 
-        const cross = new PIXI.Graphics()
-        cross.beginFill(color)
-        cross.drawRect(0, 0, Constants.tileSize, Constants.tileSize)
-        cross.x = i * Constants.tileSize
-        cross.y = j * Constants.tileSize
-        container.addChild(cross)
-      }
-    }
+    const color = (components.r << 16) + (components.g << 8) + components.b
 
-    this.background.pivot.x = this.background.width / 2
-    this.background.pivot.y = this.background.height / 2
-
-    app.renderer.render(container, { renderTexture: wheelRenderTexture })
+    const cross = new PIXI.Graphics()
+    cross.beginFill(color)
+    cross.drawRect(0, 0, Constants.tileSize, Constants.tileSize)
+    cross.x = 0 * Constants.tileSize
+    cross.y = 0 * Constants.tileSize
+    container.addChild(cross)
+    this.game.app.renderer.render(container, {
+      renderTexture: renderTexture,
+    })
+    container.destroy()
   }
 
   getGridPostition(pos: { x: number; y: number }) {
     return {
-      x: pos.x / Constants.tileSize + Constants.worldSize.x / 2,
-      y: pos.y / Constants.tileSize + Constants.worldSize.y / 2,
+      x: pos.x / Constants.tileSize,
+      y: pos.y / Constants.tileSize,
     }
   }
 }

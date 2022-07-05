@@ -1,5 +1,6 @@
 import { Viewport } from 'pixi-viewport'
 import * as PIXI from 'pixi.js'
+import { SCALE_MODES } from 'pixi.js'
 import { World } from './World'
 
 export class Game {
@@ -10,9 +11,10 @@ export class Game {
   world: World
 
   constructor(canvas: HTMLElement) {
+    PIXI.settings.SCALE_MODE = SCALE_MODES.NEAREST
+
     this.app = new PIXI.Application({
       resizeTo: window,
-      antialias: true,
     })
     canvas.appendChild(this.app.view)
 
@@ -43,6 +45,6 @@ export class Game {
       })
       .moveCenter(0, 0)
 
-    this.world = new World(this.app, this.viewport)
+    this.world = new World(this)
   }
 }

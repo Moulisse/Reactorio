@@ -57,7 +57,7 @@ export class Cursor {
 
   setListeners() {
     this.game.world.background.on('pointertap', this.handleClick)
-    this.game.world.background.on('pointermove', this.refreshPosition)
+    this.game.viewport.on('pointermove', this.refreshPosition)
     this.game.viewport.on('moved', this.refreshPosition)
     this.game.viewport.on('drag-start', this.disableClick)
 
@@ -71,7 +71,7 @@ export class Cursor {
     if (!this.game.world || !this.game.viewport) return
 
     this.game.world.background.removeListener('pointertap', this.handleClick)
-    this.game.world.background.removeListener('pointermove', this.refreshPosition)
+    this.game.viewport.removeListener('pointermove', this.refreshPosition)
     this.game.viewport.removeListener('moved', this.refreshPosition)
     this.game.viewport.removeListener('drag-start', this.disableClick)
 

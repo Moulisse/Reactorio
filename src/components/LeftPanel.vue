@@ -1,7 +1,19 @@
 <template>
   <div class="h-full card-1 rounded-3xl px-6 py-4 w-96">
     <h1 class="text-3xl">Buildings</h1>
-    <button @click="toggleCursor" :class="{ 'border-b-2': cursor }">toggle</button>
+    <div class="flex flex-col p-8">
+      <button
+        @click="toggleCursor(cursorSize)"
+        v-for="cursorSize of cursorsSize"
+        :class="{
+          'bg-slate-400':
+            cursor && cursor.width === cursorSize.width && cursor.heigth === cursorSize.heigth,
+        }"
+        class="p-4 rounded-full"
+      >
+        toggle {{ cursorSize.width }}x{{ cursorSize.heigth }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -18,30 +30,37 @@ let cursor = ref<Cursor | undefined>()
 
 const gameStore = useGameStore()
 
-B1.loadTexture()
+B1.loadTexture() //TODO enlever ca
 
-/**
- *
- */
-function toggleCursor() {
+const cursorsSize: { width: number; heigth: number }[] = [
+  { width: 1, heigth: 1 },
+  { width: 2, heigth: 2 },
+  { width: 3, heigth: 3 },
+  { width: 10, heigth: 1 },
+  { width: 1, heigth: 10 },
+  { width: 32, heigth: 32 },
+]
+
+function toggleCursor(size: { width: number; heigth: number }) {
   if (!gameStore.game) return
   if (cursor.value) {
     cursor.value.destroy()
-    cursor.value = undefined
-    return
   }
-
-  const x = 3
-  const y = 3
 
   const container = new PIXI.Container()
 
-  const circle = new PIXI.Graphics()
-  circle
-    .beginFill(0xffffff)
-    .drawRoundedRect(0, 0, Constants.tileSize * x, Constants.tileSize * y, 10)
-  container.addChild(circle)
+  const rect = new PIXI.Graphics()
+  rect
+    .beginFill(0xffffff, 0.7)
+    .drawRoundedRect(
+      0,
+      0,
+      Constants.tileSize * size.width,
+      Constants.tileSize * size.heigth,
+      Constants.tileSize / 3
+    )
+  container.addChild(rect)
 
-  cursor.value = new Cursor(container, gameStore.game as Game, x, y)
+  cursor.value = new Cursor(container, gameStore.game as Game, size.width, size.heigth)
 }
 </script>

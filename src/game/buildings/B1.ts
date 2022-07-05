@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js'
 // import * as TiledMap from 'tiled-to-pixi'
 import imgUrl from '/src/assets/revolution/revolution_tiles.png'
+import { XMLParser } from 'fast-xml-parser'
 
 export class B1 {
   mesh: PIXI.Graphics
@@ -23,24 +24,45 @@ export class B1 {
       .arc(16.5, 5, 1.5, 0, Math.PI, true)
   }
 
-  static loadTexture() {
+  static async loadTexture() {
     if (this.texture) return
 
-    const loader = new PIXI.Loader()
+    return new Promise((resolve, reject) => {
+      const url = new URL('/src/assets/map.tmx', import.meta.url).href
+      const xhr = new XMLHttpRequest()
 
-    loader
-      .add(imgUrl) // Tileset to render both maps
-      // .use(TiledMap.middleware)
-      .load((_loader, resources) => {
-        // Generate the containers for both maps
-        // let map1 = new TiledMap('TestMap1')
+      xhr.onload = function () {
+        if (!xhr.responseXML) return
 
-        this.texture = resources[imgUrl].texture
+        const parser = new XMLParser()
+        const map = parser.parse(xhr.responseXML.documentElement.outerHTML)
+        resolve(map)
+      }
 
-        // const bunny = new PIXI.TilingSprite(resources.tilemap.texture)
-      })
+      xhr.onerror = function () {
+        reject(new Error('Cannot load : ' + url))
+      }
 
-    loader.destroy()
+      xhr.open('GET', url)
+      xhr.responseType = 'document'
+      xhr.send()
+    })
+
+    // const loader = new PIXI.Loader()
+
+    // loader
+    //   .add(imgUrl) // Tileset to render both maps
+    //   // .use(TiledMap.middleware)
+    //   .load((_loader, resources) => {
+    //     // Generate the containers for both maps
+    //     // let map1 = new TiledMap('TestMap1')
+
+    //     this.texture = resources[imgUrl].texture
+
+    //     // const bunny = new PIXI.TilingSprite(resources.tilemap.texture)
+    //   })
+
+    // loader.destroy()
   }
 
   static freeTexture() {

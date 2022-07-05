@@ -1,4 +1,4 @@
 export default {
-  tileSize: 40,
-  worldSize: { x: 40, y: 30 },
+  tileSize: 8,
+  chunkSize: 32,
 }
