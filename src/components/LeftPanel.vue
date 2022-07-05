@@ -9,6 +9,7 @@
 import { B1 } from '@/game/buildings/B1'
 import Constants from '@/game/Constants'
 import { Cursor } from '@/game/Cursor'
+import type { Game } from '@/game/Game'
 import { useGameStore } from '@/stores/game'
 import * as PIXI from 'pixi.js'
 import { ref } from 'vue'
@@ -30,33 +31,17 @@ function toggleCursor() {
     return
   }
 
+  const x = 3
+  const y = 3
+
   const container = new PIXI.Container()
 
-  container.pivot.x = -20
-  container.pivot.y = -20
+  const circle = new PIXI.Graphics()
+  circle
+    .beginFill(0xffffff)
+    .drawRoundedRect(0, 0, Constants.tileSize * x, Constants.tileSize * y, 10)
+  container.addChild(circle)
 
-  for (let i = 0; i < 4; i++) {
-    const mesh = new PIXI.Graphics()
-
-    mesh
-      .beginFill(0xffffff)
-      .moveTo(15, 5)
-      .lineTo(15, 13)
-      .arc(13, 13, 2, 0, Math.PI / 2, false)
-      .lineTo(5, 15)
-      .arc(5, 16.5, 1.5, -Math.PI / 2, Math.PI / 2, true)
-      .lineTo(14, 18)
-      .arc(14, 14, 4, Math.PI / 2, 0, true)
-      .lineTo(18, 5)
-      .arc(16.5, 5, 1.5, 0, Math.PI, true)
-
-    mesh.angle = 90 * i
-
-    container.addChild(mesh)
-  }
-
-  container.scale.set(Constants.tileSize / 40)
-
-  cursor.value = new Cursor(container, gameStore.game)
+  cursor.value = new Cursor(container, gameStore.game as Game, x, y)
 }
 </script>

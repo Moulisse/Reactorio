@@ -8,6 +8,12 @@ import Constants from './Constants'
 export class Cursor {
   mesh: PIXI.Container
 
+  /**
+   * Tile size
+   */
+  width: number
+  heigth: number
+
   targetPosition?: { x: number; y: number }
   animationStartTime = 0
 
@@ -15,19 +21,18 @@ export class Cursor {
 
   private game: Game
 
-  constructor(mesh: PIXI.Container, game: Game) {
+  constructor(mesh: PIXI.Container, game: Game, width = 1, heigth = 1) {
     this.mesh = mesh
     this.game = game
+    this.width = width
+    this.heigth = heigth
 
     // Permet de passer this dans les listeners
     this.handleClick = this.handleClick.bind(this)
     this.refreshPosition = this.refreshPosition.bind(this)
     this.disableClick = this.disableClick.bind(this)
-    this.hide = this.hide.bind(this)
-    this.show = this.show.bind(this)
     this.lerp = this.lerp.bind(this)
 
-    this.mesh.visible = false
     this.refreshPosition()
     this.game.viewport.addChild(this.mesh)
 
@@ -55,8 +60,6 @@ export class Cursor {
     this.game.world.background.on('pointermove', this.refreshPosition)
     this.game.viewport.on('moved', this.refreshPosition)
     this.game.viewport.on('drag-start', this.disableClick)
-    this.game.world.background.on('pointerout', this.hide)
-    this.game.world.background.on('pointerover', this.show)
 
     this.game.world.background.interactive = true
     this.game.world.background.buttonMode = true
@@ -71,8 +74,6 @@ export class Cursor {
     this.game.world.background.removeListener('pointermove', this.refreshPosition)
     this.game.viewport.removeListener('moved', this.refreshPosition)
     this.game.viewport.removeListener('drag-start', this.disableClick)
-    this.game.world.background.removeListener('pointerout', this.hide)
-    this.game.world.background.removeListener('pointerover', this.show)
 
     this.game.world.background.interactive = false
     this.game.world.background.buttonMode = false
@@ -83,18 +84,29 @@ export class Cursor {
       const mousePos = this.game.viewport.toWorld(
         this.game.app.renderer.plugins.interaction.mouse.global
       )
+
+      // Décale d'un demi bloc si la taille est impaire
+      const xIsOdd = this.width % 2 === 0 ? 0 : Constants.tileSize / 2
+      const yIsOdd = this.heigth % 2 === 0 ? 0 : Constants.tileSize / 2
+
+      // Snap sur la grille
       const snapPos = {
-        x:
-          Math.round((mousePos.x - Constants.tileSize / 2) / Constants.tileSize) *
-          Constants.tileSize,
-        y:
-          Math.round((mousePos.y - Constants.tileSize / 2) / Constants.tileSize) *
-          Constants.tileSize,
+        x: Math.round((mousePos.x - xIsOdd) / Constants.tileSize) * Constants.tileSize,
+        y: Math.round((mousePos.y - yIsOdd) / Constants.tileSize) * Constants.tileSize,
       }
+
+      // Décalage du à la taille du curseur
+      snapPos.x -= Constants.tileSize * Math.floor(this.width / 2)
+      snapPos.y -= Constants.tileSize * Math.floor(this.heigth / 2)
+
+      // pas de refresh si on a pas bougé
       if (snapPos.x === this.mesh.position.x && snapPos.y === this.mesh.position.y) return
+
+      // evite d'animer lors du premier positionnement
       if (!this.targetPosition) {
         this.mesh.position = snapPos
       }
+
       this.targetPosition = snapPos
       this.game.app.ticker.remove(this.lerp)
       this.game.app.ticker.add(this.lerp)
@@ -105,16 +117,9 @@ export class Cursor {
     this.canClick = false
   }
 
-  hide() {
-    this.mesh.visible = false
-  }
-  show() {
-    this.mesh.visible = true
-  }
-
   handleClick() {
-    if (this.canClick) {
-      console.log('tap')
+    if (this.canClick && this.targetPosition) {
+      console.log(this.game.world.getGridPostition(this.targetPosition))
     } else {
       this.canClick = true
     }

@@ -37,4 +37,11 @@ export class World {
 
     app.renderer.render(container, { renderTexture: wheelRenderTexture })
   }
+
+  getGridPostition(pos: { x: number; y: number }) {
+    return {
+      x: pos.x / Constants.tileSize + Constants.worldSize.x / 2,
+      y: pos.y / Constants.tileSize + Constants.worldSize.y / 2,
+    }
+  }
 }

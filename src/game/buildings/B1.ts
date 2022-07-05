@@ -5,7 +5,7 @@ import imgUrl from '/src/assets/revolution/revolution_tiles.png'
 export class B1 {
   mesh: PIXI.Graphics
 
-  texture: unknown
+  static texture?: PIXI.Texture
 
   constructor() {
     this.mesh = new PIXI.Graphics()
@@ -24,18 +24,26 @@ export class B1 {
   }
 
   static loadTexture() {
-    PIXI.Loader.shared
+    if (this.texture) return
+
+    const loader = new PIXI.Loader()
+
+    loader
       .add(imgUrl) // Tileset to render both maps
       // .use(TiledMap.middleware)
-      .load(function (loader, resources) {
+      .load((_loader, resources) => {
         // Generate the containers for both maps
         // let map1 = new TiledMap('TestMap1')
 
-        console.log(resources[imgUrl].texture)
+        this.texture = resources[imgUrl].texture
 
         // const bunny = new PIXI.TilingSprite(resources.tilemap.texture)
       })
+
+    loader.destroy()
   }
 
-  static freeTexture() {}
+  static freeTexture() {
+    this.texture?.destroy()
+  }
 }

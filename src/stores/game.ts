@@ -1,5 +1,5 @@
 import { Game } from './../game/Game'
-import { defineStore } from 'pinia'
+import { acceptHMRUpdate, defineStore } from 'pinia'
 
 export const useGameStore = defineStore({
   id: 'game',
@@ -13,3 +13,7 @@ export const useGameStore = defineStore({
     },
   },
 })
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useGameStore, import.meta.hot))
+}
