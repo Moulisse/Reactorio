@@ -47,4 +47,9 @@ export class Game {
 
     this.world = new World(this)
   }
+
+  changeCursorMode(cursorMode: string) {
+    this.app.renderer.plugins.interaction.cursorStyles.default = cursorMode
+    this.app.renderer.plugins.interaction.setCursorMode(cursorMode)
+  }
 }

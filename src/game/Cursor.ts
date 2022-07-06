@@ -56,13 +56,12 @@ export class Cursor {
   }
 
   setListeners() {
-    this.game.world.background.on('pointertap', this.handleClick)
+    this.game.viewport.on('pointertap', this.handleClick)
     this.game.viewport.on('pointermove', this.refreshPosition)
     this.game.viewport.on('moved', this.refreshPosition)
     this.game.viewport.on('drag-start', this.disableClick)
 
-    this.game.world.background.interactive = true
-    this.game.world.background.buttonMode = true
+    this.game.changeCursorMode('pointer')
   }
 
   destroy() {
@@ -70,13 +69,12 @@ export class Cursor {
     this.game.app.ticker.remove(this.lerp)
     if (!this.game.world || !this.game.viewport) return
 
-    this.game.world.background.removeListener('pointertap', this.handleClick)
+    this.game.viewport.removeListener('pointertap', this.handleClick)
     this.game.viewport.removeListener('pointermove', this.refreshPosition)
     this.game.viewport.removeListener('moved', this.refreshPosition)
     this.game.viewport.removeListener('drag-start', this.disableClick)
 
-    this.game.world.background.interactive = false
-    this.game.world.background.buttonMode = false
+    this.game.changeCursorMode('auto')
   }
 
   refreshPosition() {

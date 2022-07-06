@@ -1,7 +1,7 @@
 <template>
   <div class="card-1 h-full relative" ref="canvas">
     <div class="absolute inset-y-6 ml-6">
-      <LeftPanel></LeftPanel>
+      <!-- <LeftPanel></LeftPanel> -->
     </div>
   </div>
 </template>
