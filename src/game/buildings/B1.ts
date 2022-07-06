@@ -1,15 +1,14 @@
-import * as PIXI from 'pixi.js'
-// import * as TiledMap from 'tiled-to-pixi'
 import imgUrl from '/src/assets/revolution/revolution_tiles.png'
 import { XMLParser } from 'fast-xml-parser'
+import { Graphics, type Texture } from 'pixi.js'
 
 export class B1 {
-  mesh: PIXI.Graphics
+  mesh: Graphics
 
-  static texture?: PIXI.Texture
+  static texture?: Texture
 
   constructor() {
-    this.mesh = new PIXI.Graphics()
+    this.mesh = new Graphics()
 
     this.mesh
       .beginFill(0xffffff)

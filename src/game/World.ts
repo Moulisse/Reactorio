@@ -1,12 +1,12 @@
 import type { Game } from './Game'
-import * as PIXI from 'pixi.js'
 import Constants from './Constants'
+import { Container, Graphics, RenderTexture, Sprite } from 'pixi.js'
 
 /**
  * Représente le fond du canvas
  */
 export class World {
-  background: PIXI.Sprite
+  background: Sprite
   protected chunks: Chunk[] = []
 
   protected game: Game
@@ -14,7 +14,7 @@ export class World {
   constructor(game: Game) {
     this.game = game
 
-    this.background = new PIXI.Sprite()
+    this.background = new Sprite()
     game.viewport.addChild(this.background)
 
     this.game.viewport.on('moved', () => this.computeChunks())
@@ -61,17 +61,17 @@ export class World {
    * Créé un sprite a partir du .tmj et l'ajoute au viewport et à this.chunks
    */
   protected loadChunk(x: number, y: number) {
-    const renderTexture = PIXI.RenderTexture.create({
+    const renderTexture = RenderTexture.create({
       width: chunkPixel,
       height: chunkPixel,
     })
-    const container = new PIXI.Container()
+    const container = new Container()
 
     for (let i = 0; i < Constants.chunkSize; i++) {
       for (let j = 0; j < Constants.chunkSize; j++) {
         const components = { r: 50, g: 0 + Math.random() * 255, b: 50 }
         const color = (components.r << 16) + (components.g << 8) + components.b
-        const cross = new PIXI.Graphics()
+        const cross = new Graphics()
         cross.beginFill(color)
         cross.drawRect(
           Constants.tileSize * i,
@@ -90,7 +90,7 @@ export class World {
 
     container.destroy(true)
 
-    const sprite = new PIXI.Sprite(renderTexture)
+    const sprite = new Sprite(renderTexture)
     sprite.x = x * chunkPixel
     sprite.y = y * chunkPixel
     this.game.viewport.addChild(sprite)
@@ -121,5 +121,5 @@ const chunkPixel = Constants.tileSize * Constants.chunkSize
 interface Chunk {
   x: number
   y: number
-  sprite: PIXI.Sprite
+  sprite: Sprite
 }

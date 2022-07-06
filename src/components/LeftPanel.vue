@@ -23,7 +23,7 @@ import Constants from '@/game/Constants'
 import { Cursor } from '@/game/Cursor'
 import type { Game } from '@/game/Game'
 import { useGameStore } from '@/stores/game'
-import * as PIXI from 'pixi.js'
+import { Container, Graphics } from 'pixi.js'
 import { ref } from 'vue'
 
 let cursor = ref<Cursor | undefined>()
@@ -47,9 +47,9 @@ function toggleCursor(size: { width: number; heigth: number }) {
     cursor.value.destroy()
   }
 
-  const container = new PIXI.Container()
+  const container = new Container()
 
-  const rect = new PIXI.Graphics()
+  const rect = new Graphics()
   rect
     .beginFill(0xffffff, 0.7)
     .drawRoundedRect(

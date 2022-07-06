@@ -1,12 +1,12 @@
 import type { Game } from './Game'
-import type * as PIXI from 'pixi.js'
 import Constants from './Constants'
+import type { Container } from 'pixi.js'
 
 /**
  * Dessine un mesh qui suit le pointer sur la grille du jeu
  */
 export class Cursor {
-  mesh: PIXI.Container
+  mesh: Container
 
   /**
    * Tile size
@@ -21,7 +21,7 @@ export class Cursor {
 
   private game: Game
 
-  constructor(mesh: PIXI.Container, game: Game, width = 1, heigth = 1) {
+  constructor(mesh: Container, game: Game, width = 1, heigth = 1) {
     this.mesh = mesh
     this.game = game
     this.width = width

@@ -14,4 +14,13 @@ export default defineConfig({
   server: {
     open: true,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          PIXI: ['pixi.js'],
+        },
+      },
+    },
+  },
 })
