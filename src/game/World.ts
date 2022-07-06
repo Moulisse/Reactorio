@@ -25,8 +25,6 @@ export class World {
    * calcul les chunks a afficher et re-render s'ils changent
    */
   computeChunks() {
-    // console.log(this.game.viewport.worldScreenWidth)
-
     const cameraPosition = {
       x: this.game.viewport.x / this.game.viewport.scale.x,
       y: this.game.viewport.y / this.game.viewport.scale.y,
@@ -59,6 +57,9 @@ export class World {
     }
   }
 
+  /**
+   * Créé un sprite a partir du .tmj et l'ajoute au viewport et à this.chunks
+   */
   protected loadChunk(x: number, y: number) {
     const renderTexture = PIXI.RenderTexture.create({
       width: chunkPixel,
@@ -97,6 +98,9 @@ export class World {
     this.chunks.push({ x, y, sprite })
   }
 
+  /**
+   * Supprime un chunk ainsi que son sprite
+   */
   protected unloadChunk(chunk: Chunk) {
     if (!chunk) return
     this.game.viewport.removeChild(chunk.sprite)
