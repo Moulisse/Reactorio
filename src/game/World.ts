@@ -60,13 +60,10 @@ export class World {
   }
 
   protected loadChunk(x: number, y: number) {
-    const sprite = new PIXI.Sprite()
-
     const renderTexture = PIXI.RenderTexture.create({
       width: chunkPixel,
       height: chunkPixel,
     })
-    sprite.texture = renderTexture
     const container = new PIXI.Container()
 
     for (let i = 0; i < Constants.chunkSize; i++) {
@@ -90,11 +87,11 @@ export class World {
       renderTexture: renderTexture,
     })
 
-    container.destroy()
+    container.destroy(true)
 
+    const sprite = new PIXI.Sprite(renderTexture)
     sprite.x = x * chunkPixel
     sprite.y = y * chunkPixel
-
     this.game.viewport.addChild(sprite)
 
     this.chunks.push({ x, y, sprite })
@@ -103,11 +100,7 @@ export class World {
   protected unloadChunk(chunk: Chunk) {
     if (!chunk) return
     this.game.viewport.removeChild(chunk.sprite)
-    chunk.sprite.destroy({
-      baseTexture: true,
-      children: true,
-      texture: true,
-    })
+    chunk.sprite.destroy(true)
     this.chunks.splice(this.chunks.indexOf(chunk), 1)
   }
 
