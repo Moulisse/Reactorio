@@ -4,7 +4,6 @@ import Constants from '../Constants'
 import {
   BaseTexture,
   Container,
-  Graphics,
   groupD8,
   Loader,
   Rectangle,
@@ -201,6 +200,10 @@ export class World {
       x: pos.x / Constants.tileSize,
       y: pos.y / Constants.tileSize,
     }
+  }
+
+  checkLand(x: number, y: number, width: number, height: number) {
+    return Math.random() > 0.5
   }
 }
 
