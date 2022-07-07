@@ -3,15 +3,15 @@
     <h1 class="text-3xl">Buildings</h1>
     <div class="flex flex-col p-8">
       <button
-        @click="toggleCursor(cursorSize)"
-        v-for="cursorSize of cursorsSize"
+        @click="toggleCursor(building)"
+        v-for="building of buildings"
         :class="{
           'bg-slate-400':
-            cursor && cursor.width === cursorSize.width && cursor.heigth === cursorSize.heigth,
+            cursor && cursor.width === building.width && cursor.heigth === building.height,
         }"
         class="p-4 rounded-full"
       >
-        toggle {{ cursorSize.width }}x{{ cursorSize.heigth }}
+        toggle {{ building.width }}x{{ building.height }}
       </button>
     </div>
   </div>
@@ -19,6 +19,8 @@
 
 <script setup lang="ts">
 import { B1 } from '@/game/buildings/B1'
+import { B2 } from '@/game/buildings/B2'
+import type { Building } from '@/game/buildings/Building'
 import Constants from '@/game/Constants'
 import { Cursor } from '@/game/Cursor'
 import type { Game } from '@/game/Game'
@@ -30,16 +32,9 @@ let cursor = ref<Cursor | undefined>()
 
 const gameStore = useGameStore()
 
-const cursorsSize: { width: number; heigth: number }[] = [
-  { width: 1, heigth: 1 },
-  { width: 2, heigth: 2 },
-  { width: 3, heigth: 3 },
-  { width: 10, heigth: 1 },
-  { width: 1, heigth: 10 },
-  { width: 32, heigth: 32 },
-]
+const buildings: Building[] = [new B1(), new B2()]
 
-function toggleCursor(size: { width: number; heigth: number }) {
+function toggleCursor(building: Building) {
   if (!gameStore.game) return
   if (cursor.value) {
     cursor.value.destroy()
@@ -53,12 +48,21 @@ function toggleCursor(size: { width: number; heigth: number }) {
     .drawRoundedRect(
       0,
       0,
-      Constants.tileSize * size.width,
-      Constants.tileSize * size.heigth,
+      Constants.tileSize * building.width,
+      Constants.tileSize * building.height,
       Constants.tileSize / 3
     )
   container.addChild(rect)
 
-  cursor.value = new Cursor(container, gameStore.game as Game, size.width, size.heigth)
+  cursor.value = new Cursor(container, gameStore.game as Game, building.width, building.height)
+  cursor.value.addEventListener(
+    'destroy',
+    () => {
+      cursor.value = undefined
+    },
+    {
+      once: true,
+    }
+  )
 }
 </script>

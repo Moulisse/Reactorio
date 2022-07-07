@@ -1,11 +1,11 @@
 import type { Building } from './Building'
 import type { Texture } from 'pixi.js'
 
-export class B1 implements Building {
+export class B2 implements Building {
   static texture?: Texture
 
-  readonly width = 1
-  readonly height = 2
+  readonly width = 3
+  readonly height = 3
 
   constructor() {}
 

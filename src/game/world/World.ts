@@ -60,15 +60,18 @@ export class World {
         loader.add(tileset.name, url)
       }
 
-      return new Promise<void>((resolve) => {
+      return new Promise<void>((resolve, reject) => {
         loader.load(() => {
           this.tilemap = tilemap
 
           this.game.viewport.on('moved', () => this.computeChunks())
           this.computeChunks()
+          loader.destroy()
 
           resolve()
         })
+
+        loader.onError.add(reject)
       })
     } catch (error) {}
   }

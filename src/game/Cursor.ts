@@ -1,11 +1,11 @@
 import type { Game } from './Game'
 import Constants from './Constants'
-import type { Container } from 'pixi.js'
+import type { Container, InteractionEvent } from 'pixi.js'
 
 /**
  * Dessine un mesh qui suit le pointer sur la grille du jeu
  */
-export class Cursor {
+export class Cursor extends EventTarget {
   mesh: Container
 
   /**
@@ -22,6 +22,7 @@ export class Cursor {
   private game: Game
 
   constructor(mesh: Container, game: Game, width = 1, heigth = 1) {
+    super()
     this.mesh = mesh
     this.game = game
     this.width = width
@@ -76,6 +77,8 @@ export class Cursor {
     this.game.viewport.removeListener('drag-start', this.disableClick)
 
     this.game.changeCursorMode('auto')
+
+    this.dispatchEvent(new Event('destroy'))
   }
 
   refreshPosition() {
@@ -116,9 +119,18 @@ export class Cursor {
     this.canClick = false
   }
 
-  handleClick() {
+  handleClick(event: InteractionEvent) {
     if (this.canClick && this.targetPosition) {
-      console.log(this.game.world.getGridPostition(this.targetPosition))
+      switch (event.data.button) {
+        case 2:
+          this.destroy()
+          event.stopPropagation()
+
+          break
+
+        default:
+          console.log(this.game.world.getGridPostition(this.targetPosition))
+      }
     } else {
       this.canClick = true
     }

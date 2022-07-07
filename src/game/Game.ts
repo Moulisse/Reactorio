@@ -26,6 +26,7 @@ export class Game {
       worldHeight: 1000,
 
       interaction: this.app.renderer.plugins.interaction,
+      disableOnContextMenu: true,
     })
 
     // add the viewport to the stage
