@@ -49,14 +49,14 @@ export class World {
    */
   async loadData() {
     try {
-      const url = new URL('/src/assets/map.json', import.meta.url).href
+      const url = new URL('../../assets/map.json', import.meta.url).href
       const data = await fetch(url)
       const tilemap = (await data.json()) as Tilemap
 
       const loader = new Loader()
 
       for (const tileset of tilemap.tilesets) {
-        const url = new URL(`/src/assets/${tileset.image}`, import.meta.url).href
+        const url = new URL(`../../assets/${tileset.image}`, import.meta.url).href
         loader.add(tileset.name, url)
       }
 
