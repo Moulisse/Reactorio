@@ -33,6 +33,7 @@ export class Cursor {
     this.disableClick = this.disableClick.bind(this)
     this.lerp = this.lerp.bind(this)
 
+    this.mesh.zIndex = 999
     this.refreshPosition()
     this.game.viewport.addChild(this.mesh)
 

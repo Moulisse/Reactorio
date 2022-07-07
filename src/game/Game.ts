@@ -1,6 +1,7 @@
 import { Viewport } from 'pixi-viewport'
 import { Application, SCALE_MODES, settings } from 'pixi.js'
-import { World } from './World'
+import Constants from './Constants'
+import { World } from './world/World'
 
 export class Game {
   app: Application
@@ -42,9 +43,11 @@ export class Game {
         friction: 0.9,
         minSpeed: 0.01,
       })
-      .moveCenter(0, 0)
+      .setZoom(3)
+      .moveCenter(Constants.tileSize * 14, Constants.tileSize * 5)
 
     this.world = new World(this)
+    this.world.loadData()
   }
 
   changeCursorMode(cursorMode: string) {

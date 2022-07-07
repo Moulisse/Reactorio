@@ -30,8 +30,6 @@ let cursor = ref<Cursor | undefined>()
 
 const gameStore = useGameStore()
 
-B1.loadTexture() //TODO enlever ca
-
 const cursorsSize: { width: number; heigth: number }[] = [
   { width: 1, heigth: 1 },
   { width: 2, heigth: 2 },
