@@ -106,21 +106,29 @@ export class Cursor extends EventTarget {
     }
   }
 
+  /**
+   * Passe le curseur en rouge si le terrain n'est pas constructible
+   */
   checkLand() {
     if (!this.targetPosition) return
-    const length = this.mesh.filters?.length ?? 0
+    this.mesh.filters = this.mesh.filters ?? []
+    const filterFound = this.mesh.filters.indexOf(redFilter)
+
     if (
       this.game.world.checkLand(
-        this.targetPosition.x,
-        this.targetPosition.y,
+        this.targetPosition.x / Constants.tileSize,
+        this.targetPosition.y / Constants.tileSize,
         this.width,
         this.heigth
-      ) &&
-      length === 0
+      )
     ) {
-      this.mesh.filters = [redFilter]
-    } else if (length > 0) {
-      this.mesh.filters = []
+      if (filterFound > -1) {
+        this.mesh.filters.splice(filterFound, 1)
+      }
+    } else {
+      if (filterFound < 0) {
+        this.mesh.filters.push(redFilter)
+      }
     }
   }
 
@@ -135,9 +143,22 @@ export class Cursor extends EventTarget {
           this.destroy()
           break
 
+        case 1:
+          //TODO copie de batiment
+          break
+
         default:
-          this.dispatchEvent(new CustomEvent('click', { detail: this.targetPosition }))
-          console.log(this.game.world.getGridPostition(this.targetPosition))
+          if (
+            this.game.world.checkLand(
+              this.targetPosition.x / Constants.tileSize,
+              this.targetPosition.y / Constants.tileSize,
+              this.width,
+              this.heigth
+            )
+          ) {
+            this.dispatchEvent(new CustomEvent('click', { detail: this.targetPosition }))
+            console.log(this.game.world.getGridPostition(this.targetPosition))
+          }
       }
     } else {
       this.dragging = false

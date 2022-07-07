@@ -1,4 +1,4 @@
-import type { Tilemap } from './Tilemap.d'
+import type { Tilemap, Chunk } from './Tilemap.d'
 import type { Game } from '../Game'
 import Constants from '../Constants'
 import {
@@ -21,7 +21,7 @@ export class World {
   /**
    * Contient les chunks affichés à l'écran
    */
-  protected chunks: Chunk[] = []
+  protected chunks: SpriteChunk[] = []
 
   tilemap!: Tilemap
 
@@ -131,13 +131,8 @@ export class World {
         const tileset = this.tilemap.tilesets[0]
 
         const baseTexture = BaseTexture.from(tileset.name)
-        const data = chunkData.data[j * chunkData.width + (i % chunkData.width)]
 
-        // les premiers bit servent à trouver le bon sprite
-        let textureIndex = data & 65535
-
-        // les 4 derniers servent à la rotation
-        const groupD8 = this.groupD4toD8[data >>> 29]
+        let { textureIndex, groupD8 } = this.getTileData(chunkData, i, j)
 
         // On ne dessine quand chunkData.data=0
         if (textureIndex && textureIndex <= tileset.tilecount && groupD8 !== undefined) {
@@ -188,7 +183,7 @@ export class World {
   /**
    * Supprime un chunk ainsi que son sprite
    */
-  protected unloadChunk(chunk: Chunk) {
+  protected unloadChunk(chunk: SpriteChunk) {
     if (!chunk) return
     this.game.viewport.removeChild(chunk.sprite)
     chunk.sprite.destroy(true)
@@ -202,14 +197,52 @@ export class World {
     }
   }
 
-  checkLand(x: number, y: number, width: number, height: number) {
-    return Math.random() > 0.5
+  /**
+   * Check si un rectangle est constructible
+   */
+  checkLand(x: number, y: number, width: number, height: number): boolean {
+    // Position dans le chunk
+    let chunkX = x % Constants.chunkSize
+    let chunkY = y % Constants.chunkSize
+    if (chunkX < 0) chunkX += Constants.chunkSize
+    if (chunkY < 0) chunkY += Constants.chunkSize
+
+    for (let i = chunkX; i < chunkX + width; i++) {
+      for (let j = chunkY; j < chunkY + height; j++) {
+        const chunkData = this.tilemap.layers[0].chunks.find(
+          (chunk) =>
+            chunk.x === Math.floor(x / Constants.chunkSize) * Constants.chunkSize && // index du chunk
+            chunk.y === Math.floor(y / Constants.chunkSize) * Constants.chunkSize
+        )
+        if (!chunkData) return false
+
+        let { textureIndex } = this.getTileData(chunkData, i, j)
+        if (Constants.buildableTiles.indexOf(textureIndex) < 0) {
+          return false
+        }
+      }
+    }
+    return true
+  }
+
+  getTileData(chunkData: Chunk, x: number, y: number) {
+    const data = chunkData.data[y * chunkData.width + (x % chunkData.width)]
+    // les premiers bit servent à trouver le bon sprite
+    let textureIndex = data & 65535
+
+    // les 4 derniers servent à la rotation
+    const groupD8 = this.groupD4toD8[data >>> 29]
+
+    return {
+      textureIndex,
+      groupD8,
+    }
   }
 }
 
 const chunkPixel = Constants.tileSize * Constants.chunkSize
 
-interface Chunk {
+interface SpriteChunk {
   x: number
   y: number
   sprite: Sprite

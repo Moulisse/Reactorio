@@ -7,7 +7,7 @@ interface Layer {
   chunks: Chunk[]
 }
 
-interface Chunk {
+export interface Chunk {
   x: number
   y: number
   height: number
