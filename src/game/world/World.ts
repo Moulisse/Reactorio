@@ -1,3 +1,4 @@
+import { useMapStore } from './../../stores/map'
 import type { Tilemap, Chunk } from './Tilemap.d'
 import type { Game } from '../Game'
 import Constants from '../Constants'
@@ -25,6 +26,9 @@ export class World {
   protected chunks: SpriteChunk[] = []
 
   tilemap!: Tilemap
+  get tilemapChunks() {
+    return this.tilemap?.layers[0].chunks
+  }
 
   /**
    * Permet de flip et rotate les sprites (https://pixijs.download/release/docs/PIXI.groupD8.html)
@@ -196,36 +200,6 @@ export class World {
       x: pos.x / Constants.tileSize,
       y: pos.y / Constants.tileSize,
     }
-  }
-
-  /**
-   * Check si un rectangle est constructible
-   */
-  checkLand(x: number, y: number, building: Building): boolean {
-    for (let i = x; i < x + building.width; i++) {
-      for (let j = y; j < y + building.height; j++) {
-        const chunkData = this.tilemap.layers[0].chunks.find(
-          (chunk) =>
-            chunk.x === Math.floor(i / Constants.chunkSize) * Constants.chunkSize && // index du chunk
-            chunk.y === Math.floor(j / Constants.chunkSize) * Constants.chunkSize
-        )
-        if (!chunkData) return false
-
-        // Position dans le chunk
-        let chunkI = i % Constants.chunkSize
-        let chunkJ = j % Constants.chunkSize
-        if (chunkI < 0) chunkI += Constants.chunkSize
-        if (chunkJ < 0) chunkJ += Constants.chunkSize
-
-        let { textureIndex } = this.getTileData(chunkData, chunkI, chunkJ)
-
-        if (building.buildableTiles.indexOf(textureIndex) < 0) {
-          return false
-        }
-      }
-    }
-
-    return true
   }
 
   getTileData(chunkData: Chunk, x: number, y: number) {

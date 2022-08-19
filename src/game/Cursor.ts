@@ -56,8 +56,8 @@ export class Cursor extends EventTarget {
       )
 
       // Décale d'un demi bloc si la taille est impaire
-      const xIsOdd = this.building.width % 2 === 0 ? 0 : Constants.tileSize / 2
-      const yIsOdd = this.building.height % 2 === 0 ? 0 : Constants.tileSize / 2
+      const xIsOdd = this.building.data.width % 2 === 0 ? 0 : Constants.tileSize / 2
+      const yIsOdd = this.building.data.height % 2 === 0 ? 0 : Constants.tileSize / 2
 
       // Snap sur la grille
       const snapPos = {
@@ -66,8 +66,8 @@ export class Cursor extends EventTarget {
       }
 
       // Décalage du à la taille du curseur
-      snapPos.x -= Constants.tileSize * Math.floor(this.building.width / 2)
-      snapPos.y -= Constants.tileSize * Math.floor(this.building.height / 2)
+      snapPos.x -= Constants.tileSize * Math.floor(this.building.data.width / 2)
+      snapPos.y -= Constants.tileSize * Math.floor(this.building.data.height / 2)
 
       // evite d'animer lors du premier positionnement
       if (!this.targetPosition) {
@@ -113,7 +113,7 @@ export class Cursor extends EventTarget {
     const filterFound = this.mesh.filters.indexOf(redFilter)
 
     if (
-      this.game.world.checkLand(
+      useMapStore().checkLand(
         this.targetPosition.x / Constants.tileSize,
         this.targetPosition.y / Constants.tileSize,
         this.building
@@ -146,6 +146,7 @@ export class Cursor extends EventTarget {
 
         default:
           useMapStore().build(this.building, this.game.world.getGridPostition(this.targetPosition))
+          this.checkLand()
       }
     } else {
       this.dragging = false

@@ -10,7 +10,7 @@
         }"
         class="p-4 rounded-full"
       >
-        toggle {{ building.width }}x{{ building.height }}
+        toggle {{ building.data.width }}x{{ building.data.height }}
       </button>
     </div>
   </div>
@@ -18,9 +18,7 @@
 
 <script setup lang="ts">
 import { B1 } from '@/game/buildings/B1'
-import { B2 } from '@/game/buildings/B2'
-import { B3 } from '@/game/buildings/B3'
-import type { Building } from '@/game/buildings/Building'
+import { Building } from '@/game/buildings/Building'
 import Constants from '@/game/Constants'
 import { Cursor } from '@/game/Cursor'
 import type { Game } from '@/game/Game'
@@ -32,7 +30,7 @@ let cursor = ref<Cursor | undefined>()
 
 const gameStore = useGameStore()
 
-const buildings: Building[] = [new B1(), new B2(), new B3()]
+const buildings = [new Building(B1)]
 
 function toggleCursor(building: Building) {
   if (!gameStore.game) return
@@ -48,8 +46,8 @@ function toggleCursor(building: Building) {
     .drawRoundedRect(
       0,
       0,
-      Constants.tileSize * building.width,
-      Constants.tileSize * building.height,
+      Constants.tileSize * building.data.width,
+      Constants.tileSize * building.data.height,
       Constants.tileSize / 3
     )
   container.addChild(rect)
