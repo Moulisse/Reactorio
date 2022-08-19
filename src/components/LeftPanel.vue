@@ -6,8 +6,7 @@
         @click="toggleCursor(building)"
         v-for="building of buildings"
         :class="{
-          'bg-slate-400':
-            cursor && cursor.width === building.width && cursor.heigth === building.height,
+          'bg-slate-400': cursor && cursor.building === building,
         }"
         class="p-4 rounded-full"
       >
@@ -20,6 +19,7 @@
 <script setup lang="ts">
 import { B1 } from '@/game/buildings/B1'
 import { B2 } from '@/game/buildings/B2'
+import { B3 } from '@/game/buildings/B3'
 import type { Building } from '@/game/buildings/Building'
 import Constants from '@/game/Constants'
 import { Cursor } from '@/game/Cursor'
@@ -32,7 +32,7 @@ let cursor = ref<Cursor | undefined>()
 
 const gameStore = useGameStore()
 
-const buildings: Building[] = [new B1(), new B2()]
+const buildings: Building[] = [new B1(), new B2(), new B3()]
 
 function toggleCursor(building: Building) {
   if (!gameStore.game) return
@@ -54,7 +54,7 @@ function toggleCursor(building: Building) {
     )
   container.addChild(rect)
 
-  cursor.value = new Cursor(container, gameStore.game as Game, building.width, building.height)
+  cursor.value = new Cursor(container, gameStore.game as Game, building)
   cursor.value.addEventListener(
     'destroy',
     () => {

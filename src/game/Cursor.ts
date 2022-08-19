@@ -1,3 +1,4 @@
+import type { Building } from './buildings/Building'
 import { redFilter } from './filters/red'
 import type { Game } from './Game'
 import Constants from './Constants'
@@ -9,11 +10,8 @@ import type { Container, InteractionEvent } from 'pixi.js'
 export class Cursor extends EventTarget {
   mesh: Container
 
-  /**
-   * Tile size
-   */
-  width: number
-  heigth: number
+  // batiment associé
+  building: Building
 
   targetPosition?: { x: number; y: number }
   animationStartTime = 0
@@ -22,12 +20,11 @@ export class Cursor extends EventTarget {
 
   private game: Game
 
-  constructor(mesh: Container, game: Game, width = 1, heigth = 1) {
+  constructor(mesh: Container, game: Game, building: Building) {
     super()
     this.mesh = mesh
     this.game = game
-    this.width = width
-    this.heigth = heigth
+    this.building = building
 
     // Permet de passer this dans les listeners
     this.handleClick = this.handleClick.bind(this)
@@ -58,8 +55,8 @@ export class Cursor extends EventTarget {
       )
 
       // Décale d'un demi bloc si la taille est impaire
-      const xIsOdd = this.width % 2 === 0 ? 0 : Constants.tileSize / 2
-      const yIsOdd = this.heigth % 2 === 0 ? 0 : Constants.tileSize / 2
+      const xIsOdd = this.building.width % 2 === 0 ? 0 : Constants.tileSize / 2
+      const yIsOdd = this.building.height % 2 === 0 ? 0 : Constants.tileSize / 2
 
       // Snap sur la grille
       const snapPos = {
@@ -68,8 +65,8 @@ export class Cursor extends EventTarget {
       }
 
       // Décalage du à la taille du curseur
-      snapPos.x -= Constants.tileSize * Math.floor(this.width / 2)
-      snapPos.y -= Constants.tileSize * Math.floor(this.heigth / 2)
+      snapPos.x -= Constants.tileSize * Math.floor(this.building.width / 2)
+      snapPos.y -= Constants.tileSize * Math.floor(this.building.height / 2)
 
       // evite d'animer lors du premier positionnement
       if (!this.targetPosition) {
@@ -90,10 +87,10 @@ export class Cursor extends EventTarget {
   /**
    * Interpolation de la position du curseur
    */
-  lerp() {
+  lerp(delta = 1) {
     if (this.targetPosition && this.mesh) {
-      this.mesh.position.x = this._lerp(this.mesh.position.x, this.targetPosition.x, 0.1)
-      this.mesh.position.y = this._lerp(this.mesh.position.y, this.targetPosition.y, 0.1)
+      this.mesh.position.x = this._lerp(this.mesh.position.x, this.targetPosition.x, delta / 5)
+      this.mesh.position.y = this._lerp(this.mesh.position.y, this.targetPosition.y, delta / 5)
 
       const a = this.targetPosition.x - this.mesh.position.x
       const b = this.targetPosition.y - this.mesh.position.y
@@ -118,8 +115,7 @@ export class Cursor extends EventTarget {
       this.game.world.checkLand(
         this.targetPosition.x / Constants.tileSize,
         this.targetPosition.y / Constants.tileSize,
-        this.width,
-        this.heigth
+        this.building
       )
     ) {
       if (filterFound > -1) {
@@ -152,12 +148,10 @@ export class Cursor extends EventTarget {
             this.game.world.checkLand(
               this.targetPosition.x / Constants.tileSize,
               this.targetPosition.y / Constants.tileSize,
-              this.width,
-              this.heigth
+              this.building
             )
           ) {
-            this.dispatchEvent(new CustomEvent('click', { detail: this.targetPosition }))
-            console.log(this.game.world.getGridPostition(this.targetPosition))
+            this.building.build(this.game.world.getGridPostition(this.targetPosition))
           }
       }
     } else {

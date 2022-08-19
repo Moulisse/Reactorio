@@ -11,6 +11,7 @@ import {
   Sprite,
   Texture,
 } from 'pixi.js'
+import type { Building } from '../buildings/Building'
 
 /**
  * Représente le fond du canvas
@@ -200,28 +201,30 @@ export class World {
   /**
    * Check si un rectangle est constructible
    */
-  checkLand(x: number, y: number, width: number, height: number): boolean {
-    // Position dans le chunk
-    let chunkX = x % Constants.chunkSize
-    let chunkY = y % Constants.chunkSize
-    if (chunkX < 0) chunkX += Constants.chunkSize
-    if (chunkY < 0) chunkY += Constants.chunkSize
-
-    for (let i = chunkX; i < chunkX + width; i++) {
-      for (let j = chunkY; j < chunkY + height; j++) {
+  checkLand(x: number, y: number, building: Building): boolean {
+    for (let i = x; i < x + building.width; i++) {
+      for (let j = y; j < y + building.height; j++) {
         const chunkData = this.tilemap.layers[0].chunks.find(
           (chunk) =>
-            chunk.x === Math.floor(x / Constants.chunkSize) * Constants.chunkSize && // index du chunk
-            chunk.y === Math.floor(y / Constants.chunkSize) * Constants.chunkSize
+            chunk.x === Math.floor(i / Constants.chunkSize) * Constants.chunkSize && // index du chunk
+            chunk.y === Math.floor(j / Constants.chunkSize) * Constants.chunkSize
         )
         if (!chunkData) return false
 
-        let { textureIndex } = this.getTileData(chunkData, i, j)
-        if (Constants.buildableTiles.indexOf(textureIndex) < 0) {
+        // Position dans le chunk
+        let chunkI = i % Constants.chunkSize
+        let chunkJ = j % Constants.chunkSize
+        if (chunkI < 0) chunkI += Constants.chunkSize
+        if (chunkJ < 0) chunkJ += Constants.chunkSize
+
+        let { textureIndex } = this.getTileData(chunkData, chunkI, chunkJ)
+
+        if (building.buildableTiles.indexOf(textureIndex) < 0) {
           return false
         }
       }
     }
+
     return true
   }
 
