@@ -1,16 +1,13 @@
-import { Building } from './Building'
+import type { Building } from './Building'
 import type { Texture } from 'pixi.js'
 
-export class B1 extends Building {
+export class B1 implements Building {
   static texture?: Texture
 
-  constructor() {
-    super({
-      width: 1,
-      height: 2,
-      buildableTiles: [12, 29, 30, 31],
-    })
-  }
+  readonly width = 1
+  readonly height = 2
+
+  readonly buildableTiles = [12, 29, 30, 31]
 
   static async loadTexture() {
     if (this.texture) return

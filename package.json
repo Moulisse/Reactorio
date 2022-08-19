@@ -12,6 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "pinia": "^2.0.14",
+    "pinia-plugin-persistedstate": "^2.1.1",
     "pixi-viewport": "^4.34.4",
     "pixi.js": "^6.4.2",
     "vue": "^3.2.37"

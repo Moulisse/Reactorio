@@ -1,3 +1,4 @@
+import { useMapStore } from './../stores/map'
 import type { Building } from './buildings/Building'
 import { redFilter } from './filters/red'
 import type { Game } from './Game'
@@ -144,15 +145,7 @@ export class Cursor extends EventTarget {
           break
 
         default:
-          if (
-            this.game.world.checkLand(
-              this.targetPosition.x / Constants.tileSize,
-              this.targetPosition.y / Constants.tileSize,
-              this.building
-            )
-          ) {
-            this.building.build(this.game.world.getGridPostition(this.targetPosition))
-          }
+          useMapStore().build(this.building, this.game.world.getGridPostition(this.targetPosition))
       }
     } else {
       this.dragging = false
