@@ -56,8 +56,8 @@ export class Cursor extends EventTarget {
       )
 
       // Décale d'un demi bloc si la taille est impaire
-      const xIsOdd = this.building.data.width % 2 === 0 ? 0 : Constants.tileSize / 2
-      const yIsOdd = this.building.data.height % 2 === 0 ? 0 : Constants.tileSize / 2
+      const xIsOdd = this.building.width % 2 === 0 ? 0 : Constants.tileSize / 2
+      const yIsOdd = this.building.height % 2 === 0 ? 0 : Constants.tileSize / 2
 
       // Snap sur la grille
       const snapPos = {
@@ -66,8 +66,8 @@ export class Cursor extends EventTarget {
       }
 
       // Décalage du à la taille du curseur
-      snapPos.x -= Constants.tileSize * Math.floor(this.building.data.width / 2)
-      snapPos.y -= Constants.tileSize * Math.floor(this.building.data.height / 2)
+      snapPos.x -= Constants.tileSize * Math.floor(this.building.width / 2)
+      snapPos.y -= Constants.tileSize * Math.floor(this.building.height / 2)
 
       // evite d'animer lors du premier positionnement
       if (!this.targetPosition) {
@@ -78,7 +78,19 @@ export class Cursor extends EventTarget {
       }
 
       this.targetPosition = snapPos
-      this.checkLand()
+
+      this.mesh.filters = this.mesh.filters ?? []
+      const filterFound = this.mesh.filters.indexOf(redFilter)
+
+      if (this.checkLand()) {
+        if (filterFound > -1) {
+          this.mesh.filters.splice(filterFound, 1)
+        }
+      } else {
+        if (filterFound < 0) {
+          this.mesh.filters.push(redFilter)
+        }
+      }
 
       this.game.app.ticker.remove(this.lerp)
       this.game.app.ticker.add(this.lerp)
@@ -107,26 +119,14 @@ export class Cursor extends EventTarget {
   /**
    * Passe le curseur en rouge si le terrain n'est pas constructible
    */
-  checkLand() {
-    if (!this.targetPosition) return
-    this.mesh.filters = this.mesh.filters ?? []
-    const filterFound = this.mesh.filters.indexOf(redFilter)
+  checkLand(): boolean {
+    if (!this.targetPosition) return false
 
-    if (
-      useMapStore().checkLand(
-        this.targetPosition.x / Constants.tileSize,
-        this.targetPosition.y / Constants.tileSize,
-        this.building
-      )
-    ) {
-      if (filterFound > -1) {
-        this.mesh.filters.splice(filterFound, 1)
-      }
-    } else {
-      if (filterFound < 0) {
-        this.mesh.filters.push(redFilter)
-      }
-    }
+    return useMapStore().checkLand(
+      this.targetPosition.x / Constants.tileSize,
+      this.targetPosition.y / Constants.tileSize,
+      this.building
+    )
   }
 
   startDragging() {
@@ -145,7 +145,8 @@ export class Cursor extends EventTarget {
           break
 
         default:
-          useMapStore().build(this.building, this.game.world.getGridPostition(this.targetPosition))
+          const pos = this.game.world.getGridPostition(this.targetPosition)
+          this.building.build(pos.x, pos.y)
           this.checkLand()
       }
     } else {

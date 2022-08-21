@@ -1,20 +1,15 @@
-import type { Texture } from 'pixi.js'
+import { Building } from '@/game/buildings/Building'
+import { BuildingList } from './buildings-list'
 
-export abstract class B1 {
-  static id = 1
+export class B1 extends Building {
+  id = 1
+  label = 'Small house'
 
-  static texture?: Texture
+  textureURL = new URL(`/src/assets/buildings/B1/B1.png`, import.meta.url).href
 
-  static width = 1
-  static height = 2
-
-  static buildableTiles = [12, 29, 30, 31]
-
-  static async loadTexture() {
-    if (this.texture) return
-  }
-
-  static freeTexture() {
-    this.texture?.destroy()
-  }
+  width = 2
+  height = 2
 }
+
+const b = new B1()
+BuildingList[b.id] = b

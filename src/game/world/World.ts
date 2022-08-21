@@ -5,6 +5,7 @@ import Constants from '../Constants'
 import {
   BaseTexture,
   Container,
+  Graphics,
   groupD8,
   Loader,
   Rectangle,
@@ -12,7 +13,7 @@ import {
   Sprite,
   Texture,
 } from 'pixi.js'
-import type { Building } from '../buildings/Building'
+import { BuildingList } from '../buildings/buildings-list'
 
 /**
  * Représente le fond du canvas
@@ -53,14 +54,14 @@ export class World {
    */
   async loadData() {
     try {
-      const url = new URL('../../assets/map.json', import.meta.url).href
+      const url = new URL('/src/assets/map.json', import.meta.url).href
       const data = await fetch(url)
       const tilemap = (await data.json()) as Tilemap
 
       const loader = new Loader()
 
       for (const tileset of tilemap.tilesets) {
-        const url = new URL(`../../assets/${tileset.image}`, import.meta.url).href
+        const url = new URL(`/src/assets/${tileset.image}`, import.meta.url).href
         loader.add(tileset.name, url)
       }
 
@@ -83,7 +84,7 @@ export class World {
   /**
    * calcul les chunks a afficher et re-render s'ils changent
    */
-  computeChunks() {
+  protected computeChunks() {
     const cameraPosition = {
       x: this.game.viewport.x / this.game.viewport.scale.x,
       y: this.game.viewport.y / this.game.viewport.scale.y,
@@ -119,14 +120,38 @@ export class World {
   /**
    * Créé un sprite a partir du .tmj et l'ajoute au viewport et à this.chunks
    */
-  protected loadChunk(x: number, y: number) {
+  async loadChunk(x: number, y: number) {
+    this.unloadChunk(this.chunks.find((chunk) => chunk.x === x && chunk.y === y))
+
     const renderTexture = RenderTexture.create({
-      width: chunkPixel,
-      height: chunkPixel,
+      width: chunkPixel + 3 * Constants.tileSize, // On prend 3 tile en plus afin d'afficher les buildings qui débordent
+      height: chunkPixel + 3 * Constants.tileSize,
     })
     const container = new Container()
+    this.printChunkMap(container, x, y)
+    await this.printChunkBuildings(container, x, y)
 
-    const chunkData = this.tilemap.layers[0].chunks.find(
+    this.game.app.renderer.render(container, {
+      renderTexture: renderTexture,
+    })
+
+    container.destroy()
+
+    const sprite = new Sprite(renderTexture)
+    sprite.x = x * chunkPixel
+    sprite.y = y * chunkPixel
+    sprite.zIndex = -x - y
+    this.game.viewport.addChild(sprite)
+    this.game.viewport.sortChildren()
+
+    this.chunks.push({ x, y, sprite })
+  }
+
+  /**
+   * Applique un chunk de map à un container PIXI.
+   */
+  protected printChunkMap(container: Container, x: number, y: number) {
+    const chunkData = this.tilemapChunks.find(
       (chunk) => chunk.x === x * Constants.chunkSize && chunk.y === y * Constants.chunkSize
     )
     if (!chunkData) return
@@ -168,27 +193,52 @@ export class World {
         }
       }
     }
+  }
 
-    this.game.app.renderer.render(container, {
-      renderTexture: renderTexture,
-    })
+  /**
+   * Applique tous les buildings d'un chunk.
+   */
+  protected async printChunkBuildings(container: Container, x: number, y: number) {
+    const chunk = useMapStore().chunks.find(
+      (chunkInList) => chunkInList.x === x && chunkInList.y === y
+    )
+    if (!chunk) return
 
-    container.destroy()
+    for (const building of chunk.data) {
+      const buildingData = BuildingList[building.buildingID]
+      if (buildingData) {
+        const baseTexture = await buildingData.getTexture()
 
-    const sprite = new Sprite(renderTexture)
-    sprite.x = x * chunkPixel
-    sprite.y = y * chunkPixel
-    sprite.zIndex = 0
-    this.game.viewport.addChild(sprite)
-    this.game.viewport.sortChildren()
+        const texture = new Texture(
+          baseTexture,
+          new Rectangle(
+            0,
+            0,
+            buildingData.width * Constants.tileSize,
+            buildingData.height * Constants.tileSize
+          )
+        )
 
-    this.chunks.push({ x, y, sprite })
+        // Position dans le chunk
+        let chunkI = building.x % Constants.chunkSize
+        let chunkJ = building.y % Constants.chunkSize
+        if (chunkI < 0) chunkI += Constants.chunkSize
+        if (chunkJ < 0) chunkJ += Constants.chunkSize
+
+        const sprite = new Sprite(texture)
+        sprite.position = {
+          x: chunkI * Constants.tileSize,
+          y: chunkJ * Constants.tileSize,
+        }
+        container.addChild(sprite)
+      }
+    }
   }
 
   /**
    * Supprime un chunk ainsi que son sprite
    */
-  protected unloadChunk(chunk: SpriteChunk) {
+  protected unloadChunk(chunk?: SpriteChunk) {
     if (!chunk) return
     this.game.viewport.removeChild(chunk.sprite)
     chunk.sprite.destroy(true)

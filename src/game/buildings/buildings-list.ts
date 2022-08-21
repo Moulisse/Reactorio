@@ -1,6 +1,6 @@
-import { B1 } from './B1'
+import type { Building } from '@/game/buildings/Building'
 
 /**
  * Permet d'avoir les info d'un Building grace a son ID
  */
-export let BuildingList: [undefined, ...typeof B1[]] = [undefined, B1]
+export let BuildingList: Building[] = []

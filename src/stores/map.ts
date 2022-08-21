@@ -17,40 +17,16 @@ export const useMapStore = defineStore({
   },
   actions: {
     /**
-     * Place un nouveau batiment sur la grille de jeu.
-     */
-    build(building: Building, pos: { x: number; y: number }) {
-      if (this.checkLand(pos.x, pos.y, building)) {
-        const chunkX = Math.floor(pos.x / Constants.chunkSize) * Constants.chunkSize
-        const chunkY = Math.floor(pos.y / Constants.chunkSize) * Constants.chunkSize
-
-        let chunk = this.chunks.find((chunk) => chunk.x === chunkX && chunk.y === chunkY)
-        if (!chunk) {
-          chunk = {
-            x: chunkX,
-            y: chunkY,
-            data: [],
-          }
-          this.chunks.push(chunk)
-        }
-        chunk.data.push({
-          x: pos.x,
-          y: pos.y,
-          buildingID: building.data.id,
-        })
-      }
-      this.rebuildMap()
-    },
-
-    /**
      * Check si un rectangle est constructible
      */
     checkLand(x: number, y: number, building: Building): boolean {
       const world = useGameStore().game?.world
       if (!world) return false
 
-      for (let i = x; i < x + building.data.width; i++) {
-        for (let j = y; j < y + building.data.height; j++) {
+      if (building.buildableTiles.length === 0) return true
+
+      for (let i = x; i < x + building.width; i++) {
+        for (let j = y; j < y + building.height; j++) {
           // Position dans le chunk
           let chunkI = i % Constants.chunkSize
           let chunkJ = j % Constants.chunkSize
@@ -67,7 +43,7 @@ export const useMapStore = defineStore({
 
           let { textureIndex } = world.getTileData(chunkData, chunkI, chunkJ)
 
-          if (building.data.buildableTiles.indexOf(textureIndex) < 0) {
+          if (building.buildableTiles.indexOf(textureIndex) < 0) {
             return false
           }
 

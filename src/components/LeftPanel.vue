@@ -1,16 +1,20 @@
 <template>
-  <div class="h-full card-1 rounded-3xl px-6 py-4 w-96">
-    <h1 class="text-3xl">Buildings</h1>
-    <div class="flex flex-col p-8">
+  <div class="h-full card-1 w-96">
+    <h1 class="text-3xl px-6 py-4">Buildings</h1>
+    <div class="flex flex-col">
       <button
         @click="toggleCursor(building)"
         v-for="building of buildings"
         :class="{
-          'bg-slate-400': cursor && cursor.building === building,
+          '!bg-slate-50 !text-slate-900': cursor && cursor.building === building,
         }"
-        class="p-4 rounded-full"
+        class="text-slate-50 flex items-center h-10"
       >
-        toggle {{ building.data.width }}x{{ building.data.height }}
+        <img
+          :src="building.textureURL"
+          class="aspect-square w-8 mx-3 mb-1 bg-slate-50 rounded-sm"
+        />
+        {{ building.label }} ({{ building.width }}x{{ building.height }})
       </button>
     </div>
   </div>
@@ -18,7 +22,8 @@
 
 <script setup lang="ts">
 import { B1 } from '@/game/buildings/B1'
-import { Building } from '@/game/buildings/Building'
+import { DestroyBuilding } from '@/game/buildings/DestroyBuilding'
+import type { Building } from '@/game/buildings/Building'
 import Constants from '@/game/Constants'
 import { Cursor } from '@/game/Cursor'
 import type { Game } from '@/game/Game'
@@ -30,7 +35,7 @@ let cursor = ref<Cursor | undefined>()
 
 const gameStore = useGameStore()
 
-const buildings = [new Building(B1)]
+const buildings = [new B1(), new DestroyBuilding()]
 
 function toggleCursor(building: Building) {
   if (!gameStore.game) return
@@ -46,8 +51,8 @@ function toggleCursor(building: Building) {
     .drawRoundedRect(
       0,
       0,
-      Constants.tileSize * building.data.width,
-      Constants.tileSize * building.data.height,
+      Constants.tileSize * building.width,
+      Constants.tileSize * building.height,
       Constants.tileSize / 3
     )
   container.addChild(rect)
